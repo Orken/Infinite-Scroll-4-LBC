@@ -8,7 +8,7 @@ Il suffit juste de copier/coller le code dans un nouveau script GreaseMonkey
 Et l'infinite scroll est actif sur leboncoin.fr ;)
 
 
-**TODO
+##TODO
 - nettoyer le code
 - ajouter des vérifs
 - optimiser tout ça.
