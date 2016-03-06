@@ -1,59 +1,69 @@
 // ==UserScript==
 // @grant none
 // @name     InfiniteScroll4LBC
-// @require  http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
 // @include   http://www.leboncoin.fr/*
 //
 // ==/UserScript==
-this.$ = this.jQuery = jQuery.noConflict(true);
+
+if (!$('footer.pagination').length) return;
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
 
 var load     = false;
-var offset   = $('#paging') .offset() .top;
-var $listlbc = $('.list-lbc');
-var $content = $('.content-border');
+var offset   = $('footer.pagination') .offset() .top;
+var $content = $('ul.tabsContent');
+var $page_max     = getParameterByName('o', $('.pagination_links_container a#last').attr('href'));
+
+$content.prepend(
+    $('<li/>').append(
+        $('<div/>',{style:'padding:10px;background:silver;color:#fff;font-size:15px;'})
+        .text('PAGE '+$('footer.pagination').find('.selected').text()+' / '+$page_max)
+    )
+);
 
 var ajoutePage = function (html) {
-
-    $('#paging') .remove();
-
-    var $html    = $(html);
-    var $ads     = $html.find('.list-lbc a');
-    var $page    = $html.find('#paging');
-
-    $listlbc.append($ads);
-    $content.after($page);
-
-    offset = $('#paging') .offset() .top;
+    var $html = $(html);
+    $content.append( $html.find('ul.tabsContent').html() );
+    $('footer.pagination').html( $html.find('footer.pagination') );
+    offset = $('footer.pagination') .offset() .top;
     load   = false;
 };
 
 $(window).scroll(function () {
-    var height   = window.innerHeight;
-    var scrollY  = window.scrollY;
+    var height  = window.innerHeight;
+    var scrollY = window.scrollY;
     if ((!load) && (scrollY > (offset - height))) {
         load            = true;
-        var $pagination = $('#paging');
-        var $url        = $('li.page:last a');
-        if ($url.length>0) { 
+        var $pagination = $('footer.pagination');
+        var $url        = $('.pagination_links_container a#next');
+
+        if ($url.length > 0) {
             var selected = $pagination.find('.selected').next().text();
-            var url      = $url.get(0).href;
+            var url      = $url.attr('href');
 
-            var $a = $('<a/>',{href:url})
-                .append( 
-                    $('<div/>',{class:'lbc'})
-                        .append( $('<div/>',{class:'date'}) )
-                        .append( $('<div/>',{class:'image'}) )
-                        .append( $('<div/>',{class:'detail'}).text('PAGE '+selected) )
-                        .append( $('<div/>',{class:'clear'}) )
-                );
+            $content.append(
+                $('<a/>',{href:url, target:'_blank', style:'text-decoration:none;color:#fff;'})
+                    .append(
+                        $('<li/>')
+                        .append( $('<div/>',{style:'padding:10px;background:silver;font-size:15px;'})
+                        .text('PAGE ' + selected + ' / ' + $page_max) )
+                    )
+            );
 
-            $listlbc.append($a);            
             $pagination.empty().html('<center>Chargement...</center>');
             $.ajax({
                 url: url,
                 success: ajoutePage,
                 error: function (error) {
-                    alert('ko');
+                    alert('Erreur de chargement de la page');
                     console.log(error);
                 },
             });
