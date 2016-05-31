@@ -1,7 +1,7 @@
 // ==UserScript==
 // @grant none
 // @name     InfiniteScroll4LBC
-// @include   http://www.leboncoin.fr/*
+// @include   http*://www.leboncoin.fr/*
 //
 // ==/UserScript==
 
@@ -17,10 +17,10 @@ function getParameterByName(name, url) {
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-var load     = false;
-var offset   = $('footer.pagination') .offset() .top;
-var $content = $('ul.tabsContent');
-var $page_max     = getParameterByName('o', $('.pagination_links_container a#last').attr('href'));
+var load      = false;
+var offset    = $('footer.pagination').offset().top;
+var $content  = $('.tabsContent ul');
+var $page_max = getParameterByName('o', $('.pagination_links_container a#last').attr('href'));
 
 $content.prepend(
     $('<li/>').append(
@@ -31,7 +31,7 @@ $content.prepend(
 
 var ajoutePage = function (html) {
     var $html = $(html);
-    $content.append( $html.find('ul.tabsContent').html() );
+    $content.append( $html.find('.tabsContent ul').html() );
     $('footer.pagination').html( $html.find('footer.pagination') );
     offset = $('footer.pagination') .offset() .top;
     load   = false;
