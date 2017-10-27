@@ -1,5 +1,5 @@
 // ==UserScript==
-// @grant none
+// @grant unsafeWindow
 // @name     InfiniteScroll4LBC
 // @include   http*://www.leboncoin.fr/*
 //
@@ -35,6 +35,9 @@ var ajoutePage = function (html) {
     $('footer.pagination').html( $html.find('footer.pagination') );
     offset = $('footer.pagination') .offset() .top;
     load   = false;
+    if (typeof(unsafeWindow.previewLBC) != 'undefined') {
+        unsafeWindow.previewLBC();
+    }
 };
 
 $(window).scroll(function () {
